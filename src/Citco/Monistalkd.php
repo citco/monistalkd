@@ -3,6 +3,7 @@
 use Citco\Exception\MaxJobAgeExceededException;
 use Citco\Exception\MaxJobsExceededException;
 use Citco\Exception\RateOfRiseExceededException;
+use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Pheanstalk;
 
 class Monistalkd {
@@ -11,6 +12,8 @@ class Monistalkd {
 	private $maxJobs;
 	private $rateOfRise;
 	private $maxJobAge;
+
+	const ROR_CHECK_SECONDS = 5;
 
 	public function __construct(Pheanstalk $connection)
 	{
@@ -63,11 +66,11 @@ class Monistalkd {
 		{
 			$stat = $this->connection->statsTube($tube);
 
-			sleep(5);
+			sleep(static::ROR_CHECK_SECONDS);
 
 			$newStat = $this->connection->statsTube($tube);
 
-			$rateOfRise = ($newStat['total-jobs'] - $stat['total-jobs']) / 5;
+			$rateOfRise = ($newStat['total-jobs'] - $stat['total-jobs']) / static::ROR_CHECK_SECONDS;
 
 			if ($rateOfRise >= $this->rateOfRise)
 			{
@@ -80,11 +83,25 @@ class Monistalkd {
 	{
 		if ($this->maxJobAge)
 		{
-			$job = $this->connection->peekReady($tube);
+			try
+			{
 
-			$stat = $this->connection->statsJob($job);
+				$job = $this->connection->peekReady($tube);
+				$stat = $this->connection->statsJob($job);
+			}
+			catch (ServerException $e)
+			{
+				if (stripos($e->getMessage(), 'NOT_FOUND') !== false)
+				{
+					$stat = null;
+				}
+				else
+				{
+					throw $e;
+				}
+			}
 
-			if ($stat['age'] >= $this->maxJobAge)
+			if ($stat && $stat['age'] >= $this->maxJobAge)
 			{
 				throw new MaxJobAgeExceededException('Max job age: ' . $this->maxJobAge . ' seconds exceeded in tube: ' . $tube);
 			}

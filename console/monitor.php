@@ -22,7 +22,11 @@ $monitor->setRateOfRise($rateOfRise);
 
 try
 {
+	echo date("Y/m/d H:i:s: ") . 'Health checks started' . PHP_EOL;
+
 	$monitor->check();
+
+	echo date("Y/m/d H:i:s: ") . 'All checks completed' . PHP_EOL;
 }
 catch (\Citco\Exception\MonitorException $e)
 {
