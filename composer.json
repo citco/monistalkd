@@ -1,23 +1,27 @@
 {
-    "name": "citco/monistalkd",
-    "description": "Beanstalkd monitoring package",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Amir",
-            "email": "amir@creativeinvestments.co.uk"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {
-        "pda/pheanstalk": "^3.1",
-        "vlucas/phpdotenv": "^2.4",
-        "swiftmailer/swiftmailer": "^5.4"
-    },
-    "autoload": {
-        "classmap": [
-            "src"
-        ]
-    }
+	"name": "citco/monistalkd",
+	"description": "Beanstalkd monitoring package",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Amir",
+			"email": "amir@creativeinvestments.co.uk"
+		}
+	],
+	"minimum-stability": "stable",
+	"require": {
+		"pda/pheanstalk": "^3.1",
+		"vlucas/phpdotenv": "^2.4",
+		"swiftmailer/swiftmailer": "^5.4"
+	},
+	"autoload": {
+		"classmap": [
+			"src"
+		]
+	},
+	"require-dev": {
+		"mockery/mockery": "^0.9.9",
+		"phpunit/phpunit": "^5.7"
+	}
 }

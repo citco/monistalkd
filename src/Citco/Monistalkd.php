@@ -55,7 +55,7 @@ class Monistalkd {
 
 			if ((int) $stat['total-jobs'] >= $this->maxJobs)
 			{
-				throw new MaxJobsExceededException('Maximum number of jobs: ' . $stat['total-jobs'] . ' exceeded in tube: ' . $tube);
+				throw new MaxJobsExceededException("Maximum number of jobs: {$this->maxJobs} exceeded in tube: '{$tube}' with total jobs: '{$stat['total-jobs']}''");
 			}
 		}
 	}
@@ -74,7 +74,7 @@ class Monistalkd {
 
 			if ($rateOfRise >= $this->rateOfRise)
 			{
-				throw new RateOfRiseExceededException('Rate of rise: ' . $this->rateOfRise . ' jobs per second exceeded in tube: ' . $tube);
+				throw new RateOfRiseExceededException("Maximum rate of rise: {$this->rateOfRise} jobs per second exceeded in tube: '{$tube}' with rate of rise: '{$rateOfRise}'");
 			}
 		}
 	}
@@ -83,10 +83,12 @@ class Monistalkd {
 	{
 		if ($this->maxJobAge)
 		{
+			$job_data = null;
+
 			try
 			{
-
 				$job = $this->connection->peekReady($tube);
+				$job_data = $job->getData();
 				$stat = $this->connection->statsJob($job);
 			}
 			catch (ServerException $e)
@@ -103,7 +105,7 @@ class Monistalkd {
 
 			if ($stat && $stat['age'] >= $this->maxJobAge)
 			{
-				throw new MaxJobAgeExceededException('Max job age: ' . $this->maxJobAge . ' seconds exceeded in tube: ' . $tube);
+				throw new MaxJobAgeExceededException("Max job age {$this->maxJobAge} seconds exceeded in tube '{$tube}' with age '{$stat['age']}' seconds. Job data: '{$job_data}'");
 			}
 		}
 	}
